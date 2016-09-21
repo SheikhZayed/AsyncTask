@@ -2,6 +2,7 @@ package com.example.techjini.threadbasics;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,7 +37,7 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
     private RecyclerView.LayoutManager mLayoutManager;
     private SongAdapter songAdapter;
     private NetStatus networkStatus;
-    private ImageView mIvRefresh;
+    private ImageView mIvRefresh,mIvAsync;
 
 
     @Override
@@ -71,9 +72,11 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
         mRvSongs.setHasFixedSize(true);
         mIvRefresh = (ImageView) findViewById(R.id.xIvRefresh);
         mIvRefresh.setOnClickListener(this);
+        mIvAsync = (ImageView) findViewById(R.id.xIvAsync);
+        mIvAsync.setOnClickListener(this);
     }
 
-    private void startServerConn() {
+    public void startServerConn() {
         progressDialog.show();
         Thread myThread = new Thread(new Runnable() {
             @Override
@@ -144,13 +147,14 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
                 if (networkStatus.isNetworkAvailable()) {
                     startServerConn();
                 } else {
-                    Toast.makeText(this, "There is no Internet available, please check", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "There is no Internet available,please check", Toast.LENGTH_LONG).show();
                 }
                 break;
             }
-            default: {
+            case R.id.xIvAsync:
+                Intent intent = new Intent(MainActivity.this, AsyncActivity.class);
+                startActivity(intent);
                 break;
-            }
         }
     }
 
