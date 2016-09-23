@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Thread Basics</string>
+    <string name="btn_async">Async Activity</string>
 </resources>

@@ -2,12 +2,19 @@ package com.example.techjini.threadbasics;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -16,11 +23,14 @@ import com.example.techjini.threadbasics.adapter.SongAdapter;
 import com.example.techjini.threadbasics.helper.DownloadClickListener;
 import com.example.techjini.threadbasics.helper.NetStatus;
 import com.example.techjini.threadbasics.helper.NetworkRequest;
+import com.example.techjini.threadbasics.model.Download;
 import com.example.techjini.threadbasics.model.Songs;
+import com.example.techjini.threadbasics.service.DownloadService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity implements Handler.Callback, View.OnClickListener, DownloadClickListener {
@@ -38,7 +48,7 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
     private SongAdapter songAdapter;
     private NetStatus networkStatus;
     private ImageView mIvRefresh,mIvAsync;
-
+    public static final String MESSAGE_PROGRESS = "message_progress";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +56,48 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
         setContentView(R.layout.activity_main);
         initWidgets();
         initObjects();
+        registerReceiver();
         if (networkStatus.isNetworkAvailable()) {
             startServerConn();
         } else
             Toast.makeText(getApplicationContext(), "No Internet Available", Toast.LENGTH_SHORT).show();
     }
+
+    private void registerReceiver() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MESSAGE_PROGRESS);
+        broadcastManager.registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(MESSAGE_PROGRESS)){
+                Download download = intent.getParcelableExtra("download");
+                Uri uri = Uri.parse(intent.getStringExtra("uri"));
+                String songUrl = intent.getStringExtra("url");
+                if (download.getProgress() == 100){
+                    for(Songs songList : songs)
+                    {
+                        Log.d("info","inside foreach");
+                        if (songList.getUrl().equals(songUrl))
+                            songList.setState(1);
+                        Log.d("info","switching state 1");
+                        break;
+                    }
+                    songAdapter.notifyDataSetChanged();
+                    Toast.makeText(getApplicationContext(),"Playing Song from " + uri,Toast.LENGTH_SHORT).show();
+                    MediaPlayer mediaPlayer = MediaPlayer.create(MainActivity.this,Uri.parse(uri.getPath()));
+                    if (mediaPlayer.isPlaying()){
+                        mediaPlayer.stop();
+                    }
+                    else
+                        mediaPlayer.start();
+                }
+            }
+        }
+    };
 
     private void initObjects() {
         networkRequest = new NetworkRequest();
@@ -114,7 +161,6 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
         });
         myThread.start();
     }
-
     @Override
     public boolean handleMessage(Message msg) {
         progressDialog.dismiss();
@@ -136,7 +182,6 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
                 } else
                     songAdapter.notifyDataSetChanged();
         }
-
         return false;
     }
 
@@ -147,12 +192,12 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
                 if (networkStatus.isNetworkAvailable()) {
                     startServerConn();
                 } else {
-                    Toast.makeText(this, "There is no Internet available,please check", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "There is no Internet available,please verify", Toast.LENGTH_LONG).show();
                 }
                 break;
             }
             case R.id.xIvAsync:
-                Intent intent = new Intent(MainActivity.this, AsyncActivity.class);
+                Intent intent = new Intent(MainActivity.this, RetrofitActivity.class);
                 startActivity(intent);
                 break;
         }
@@ -160,7 +205,13 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
 
 
     @Override
-    public void onDownloadClicked(int songId, String downloadUrl) {
+    public void onDownloadClicked(int songId, String downloadUrl,String songName) {
         System.out.println("Song Id : " + songId + " : Download URL : " + downloadUrl);
+        Intent serviceIntent = new Intent(this, DownloadService.class);
+        serviceIntent.putExtra("URL",downloadUrl);
+        serviceIntent.putExtra("NAME",songName);
+        this.startService(serviceIntent);
+
     }
+
 }

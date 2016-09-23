@@ -6,11 +6,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.techjini.threadbasics.adapter.SongAdapter;
 import com.example.techjini.threadbasics.helper.DownloadClickListener;
+import com.example.techjini.threadbasics.helper.NetStatus;
 import com.example.techjini.threadbasics.helper.NetworkRequest;
 import com.example.techjini.threadbasics.helper.StaticUtils;
 import com.example.techjini.threadbasics.model.Songs;
@@ -18,17 +18,21 @@ import com.example.techjini.threadbasics.model.Songs;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.net.URL;
 import java.util.ArrayList;
 
-public class AsyncActivity extends Activity{
+public class AsyncActivity extends Activity {
 
     private NetworkRequest networkRequest;
+    private NetStatus netStatus;
     private ArrayList<Songs> songsArrayList;
     private ProgressDialog progressDialog;
     private RecyclerView mRvSongs;
     private RecyclerView.LayoutManager mLayoutManager;
     private SongAdapter songAdapter;
+    private final int ERROR_HTTP_CLIENT_TIMEOUT = 1;
+    private final int ERROR_IO_EXCEPTION = 2;
+    private final int ERROR_UNKNOWN = 3;
+    private final int SUCCESS = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +40,10 @@ public class AsyncActivity extends Activity{
         setContentView(R.layout.activity_async);
         initWidgets();
         initObjects();
+        if (netStatus.isNetworkAvailable())
         new DownloadSongsList().execute(StaticUtils.API_URL);
+        else
+            Toast.makeText(getApplicationContext(),"error in establishing connection",Toast.LENGTH_SHORT).show();
     }
 
     private void initWidgets() {
@@ -45,10 +52,10 @@ public class AsyncActivity extends Activity{
         mRvSongs.setLayoutManager(mLayoutManager);
         mRvSongs.setHasFixedSize(true);
     }
-
     private void initObjects() {
+        netStatus = new NetStatus(this);
         networkRequest = new NetworkRequest();
-        songsArrayList= new ArrayList<>();
+        songsArrayList = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Please wait...");
         progressDialog.setMessage("While fetching data from server");
@@ -56,9 +63,7 @@ public class AsyncActivity extends Activity{
         progressDialog.setCancelable(false);
         progressDialog.setIndeterminate(true);
     }
-
-
-    private class DownloadSongsList extends AsyncTask<String,Integer,ArrayList<Songs>> implements DownloadClickListener {
+    private class DownloadSongsList extends AsyncTask<String, Integer, Integer> implements DownloadClickListener {
 
         @Override
         protected void onPreExecute() {
@@ -66,18 +71,15 @@ public class AsyncActivity extends Activity{
         }
 
         @Override
-        protected ArrayList<Songs> doInBackground(String... params) {
+        protected Integer doInBackground(String... params) {
             String response = networkRequest.callServer();
             switch (response) {
                 case NetworkRequest.ERROR_HTTP_CLIENT_TIMEOUT:
-                    displayToast("Connection Time out");
-                    break;
+                    return ERROR_HTTP_CLIENT_TIMEOUT;
                 case NetworkRequest.ERROR_IO_EXCEPTION:
-                    displayToast("Error in IO Connection");
-                    break;
+                    return ERROR_IO_EXCEPTION;
                 case NetworkRequest.ERROR_UNKNOWN:
-                    displayToast("Unknown Error");
-                    break;
+                    return ERROR_UNKNOWN;
                 default:
                     try {
                         JSONArray songsArray = new JSONArray(response);
@@ -95,28 +97,36 @@ public class AsyncActivity extends Activity{
                         e.printStackTrace();
                     }
             }
-            return songsArrayList;
+            return SUCCESS;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Songs> songsArrayList) {
-            super.onPostExecute(songsArrayList);
+        protected void onPostExecute(Integer status) {
+            super.onPostExecute(status);
             progressDialog.dismiss();
-            if (null == songAdapter) {
-                songAdapter = new SongAdapter(songsArrayList,AsyncActivity.this,this);
-                mRvSongs.setAdapter(songAdapter);
-            } else
-                songAdapter.notifyDataSetChanged();
 
+            switch (status) {
+                case ERROR_HTTP_CLIENT_TIMEOUT:
+                    Toast.makeText(getApplicationContext(), "time out occurred", Toast.LENGTH_SHORT).show();
+                    break;
+                case ERROR_IO_EXCEPTION:
+                    Toast.makeText(getApplicationContext(), "io exception occurred", Toast.LENGTH_SHORT).show();
+                    break;
+                case ERROR_UNKNOWN:
+                    Toast.makeText(getApplicationContext(), "unknown error", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                if (null == songAdapter) {
+                    songAdapter = new SongAdapter(songsArrayList, AsyncActivity.this, this);
+                    mRvSongs.setAdapter(songAdapter);
+                } else
+                    songAdapter.notifyDataSetChanged();
+
+            }
         }
-
         @Override
-        public void onDownloadClicked(int songId, String downloadUrl) {
+        public void onDownloadClicked(int songId, String downloadUrl,String songName) {
             System.out.println("Song Id : " + songId + " : Download URL : " + downloadUrl);
         }
-    }
-
-    private void displayToast(String msg) {
-        Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
     }
 }

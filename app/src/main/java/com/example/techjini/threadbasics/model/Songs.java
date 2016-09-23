@@ -1,16 +1,27 @@
 package com.example.techjini.threadbasics.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Created by techjini on 19/9/16.
  */
 public class Songs {
+    @JsonProperty("id")
     private int id;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("image")
     private String image;
+    @JsonProperty("artist")
     private String artist;
+    @JsonProperty("downloadUrl")
     private String url;
 
+    private int state;
 
+    public Songs() {
+        this.state = 2;
+    }
 
     public int getId() {
         return id;
@@ -50,5 +61,13 @@ public class Songs {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 }
