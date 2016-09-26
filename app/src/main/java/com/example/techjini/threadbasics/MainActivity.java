@@ -81,7 +81,7 @@ public class MainActivity extends Activity implements Handler.Callback, View.OnC
                     for(Songs songList : songs)
                     {
                         Log.d("info","inside foreach");
-                        if (songList.getUrl().equals(songUrl))
+                        if (!(songList.getUrl().equals(songUrl)))
                             songList.setState(1);
                         Log.d("info","switching state 1");
                         break;
