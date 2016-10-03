@@ -1,11 +1,12 @@
 package com.example.techjini.threadbasics.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by techjini on 19/9/16.
  */
-public class Songs {
+public class SongsModel {
     @JsonProperty("id")
     private int id;
     @JsonProperty("name")
@@ -16,11 +17,11 @@ public class Songs {
     private String artist;
     @JsonProperty("downloadUrl")
     private String url;
-
+    @JsonIgnore
     private int state;
 
-    public Songs() {
-        this.state = 2;
+    public SongsModel() {
+        this.state = 0;
     }
 
     public int getId() {

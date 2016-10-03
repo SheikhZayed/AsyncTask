@@ -5,21 +5,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
-import com.example.techjini.threadbasics.MainActivity;
 import com.example.techjini.threadbasics.R;
-import com.example.techjini.threadbasics.adapter.SongAdapter;
-import com.example.techjini.threadbasics.helper.APIInterface;
-import com.example.techjini.threadbasics.model.Download;
+import com.example.techjini.threadbasics.constants.AppConstants;
+import com.example.techjini.threadbasics.interfaces.APIInterface;
+import com.example.techjini.threadbasics.model.DownloadModel;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -27,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -39,8 +34,7 @@ public class DownloadService extends IntentService {
     private NotificationManager mNotificationManager;
     private int mTotalFileSize;
     private String mUrl,mSongName;
-    private String mSongUri;
-    private Call<ResponseBody> call;
+    private Call<ResponseBody> mCall;
 
     public DownloadService() {
         super("DownloadService");
@@ -67,10 +61,10 @@ public class DownloadService extends IntentService {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_download)
-                .setContentTitle("Downloading")
-                .setContentText("Downloading " + mSongName +"...")
+                .setContentTitle(getString(R.string.notif_title))
+                .setContentText(getString(R.string.notif_content) + mSongName +"...")
                 .setAutoCancel(true)
-                .addAction(R.mipmap.ic_play, "Play", pIntent);
+                .addAction(R.drawable.ic_play_circle_filled_black_24dp, getString(R.string.notif_button), pIntent);
         mNotificationManager.notify(0, mNotificationBuilder.build());
 
         initDownload();
@@ -78,12 +72,12 @@ public class DownloadService extends IntentService {
 
     private void initDownload() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://2015.downloadming1.com")
+                .baseUrl(AppConstants.MUSIC_URL)
                 .build();
         APIInterface apiInterface = retrofit.create(APIInterface.class);
-        call = apiInterface.downloadFile(mUrl);
+        mCall = apiInterface.downloadFile(mUrl);
         try {
-            downloadFile(call.execute().body());
+            downloadFile(mCall.execute().body());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,7 +89,6 @@ public class DownloadService extends IntentService {
         long fileSize = body.contentLength();
         InputStream bis = new BufferedInputStream(body.byteStream(), 1024 * 8);
         File outputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), mSongName+".mp3");
-        mSongUri = outputFile.getAbsolutePath().toString();
         OutputStream output = new FileOutputStream(outputFile);
         long total = 0;
         long startTime = System.currentTimeMillis();
@@ -110,7 +103,7 @@ public class DownloadService extends IntentService {
 
             long currentTime = System.currentTimeMillis() - startTime;
 
-            Download download = new Download();
+            DownloadModel download = new DownloadModel();
             download.setTotalFileSize(mTotalFileSize);
 
             if (currentTime > 1000 * timeCount) {
@@ -127,15 +120,15 @@ public class DownloadService extends IntentService {
         bis.close();
     }
 
-    private void sendNotification(Download download) {
+    private void sendNotification(DownloadModel download) {
         sendIntent(download);
         mNotificationBuilder.setProgress(100, download.getProgress(), false);
-        mNotificationBuilder.setContentText("Downloading " + mSongName  + download.getCurrentFileSize() + "/" + mTotalFileSize + " MB");
+        mNotificationBuilder.setContentText(getString(R.string.progress_downloading_title) + mSongName  + download.getCurrentFileSize() + "/" + mTotalFileSize + " MB");
         mNotificationManager.notify(0, mNotificationBuilder.build());
     }
 
     private void onDownloadComplete() {
-        Download download = new Download();
+        DownloadModel download = new DownloadModel();
         download.setProgress(100);
         sendIntent(download);
 
@@ -145,11 +138,10 @@ public class DownloadService extends IntentService {
         mNotificationManager.notify(0, mNotificationBuilder.build());
     }
 
-    private void sendIntent(Download download) {
-        Intent intent = new Intent(MainActivity.MESSAGE_PROGRESS);
+    private void sendIntent(DownloadModel download) {
+        Intent intent = new Intent(AppConstants.MESSAGE_PROGRESS);
         intent.putExtra("download", download);
-        intent.putExtra("uri",mSongUri);
-        intent.putExtra("url",mUrl);
+        intent.putExtra("name",mSongName);
         LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(intent);
     }
 

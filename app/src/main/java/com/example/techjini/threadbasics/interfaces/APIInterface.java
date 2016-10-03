@@ -1,6 +1,6 @@
-package com.example.techjini.threadbasics.helper;
+package com.example.techjini.threadbasics.interfaces;
 
-import com.example.techjini.threadbasics.model.Songs;
+import com.example.techjini.threadbasics.model.SongsModel;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import retrofit2.http.Url;
  */
 public interface APIInterface {
     @GET("assignment.json")
-    Call<List<Songs>> getSongsList();
+    Call<List<SongsModel>> getSongsList();
 
     @GET
     @Streaming

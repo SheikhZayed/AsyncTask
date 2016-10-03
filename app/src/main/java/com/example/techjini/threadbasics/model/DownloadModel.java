@@ -6,14 +6,15 @@ import android.os.Parcelable;
 /**
  * Created by techjini on 23/9/16.
  */
-public class Download implements Parcelable{
-    public Download(){
-
-    }
+public class DownloadModel implements Parcelable{
 
     private int progress;
     private int currentFileSize;
     private int totalFileSize;
+
+    public DownloadModel(){
+
+    }
 
     public int getProgress() {
         return progress;
@@ -53,20 +54,20 @@ public class Download implements Parcelable{
         dest.writeInt(totalFileSize);
     }
 
-    private Download(Parcel in) {
+    private DownloadModel(Parcel in) {
 
         progress = in.readInt();
         currentFileSize = in.readInt();
         totalFileSize = in.readInt();
     }
 
-    public static final Parcelable.Creator<Download> CREATOR = new Parcelable.Creator<Download>() {
-        public Download createFromParcel(Parcel in) {
-            return new Download(in);
+    public static final Parcelable.Creator<DownloadModel> CREATOR = new Parcelable.Creator<DownloadModel>() {
+        public DownloadModel createFromParcel(Parcel in) {
+            return new DownloadModel(in);
         }
 
-        public Download[] newArray(int size) {
-            return new Download[size];
+        public DownloadModel[] newArray(int size) {
+            return new DownloadModel[size];
         }
     };
 }

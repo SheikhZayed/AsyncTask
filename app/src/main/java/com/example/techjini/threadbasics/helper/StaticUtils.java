@@ -11,8 +11,6 @@ import java.net.URL;
  */
 
 public class StaticUtils {
-    public static final String API_URL = "http://tools.techjini.com/assignment.json";
-
 
     public static String sConvertStreamToString(InputStream inputStream) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

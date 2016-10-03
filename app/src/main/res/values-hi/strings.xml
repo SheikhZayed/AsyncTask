@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="header_detail">गीत विवरण</string>
+    <string name="text_button_play">प्ले</string>
+    <string name="text_button_pause">ठहराव</string>
+    <string name="app_name">गीत</string>
+    <string name="btn_async">गीत</string>
+    <string name="progress_title">गीत</string>
+    <string name="progress_content">गीत</string>
+    <string name="error_timeout">गीत</string>
+    <string name="error_io">गीत</string>
+    <string name="error_unknown">गीत</string>
+    <string name="log_songID">गीत</string>
+    <string name="log_downloadurl">गीत</string>
+    <string name="error_conn">गीत</string>
+    <string name="error_no_internet">गीत</string>
+    <string name="info_playing_song">गीत</string>
+    <string name="notif_title">गीत</string>
+    <string name="notif_content">गीत</string>
+    <string name="notif_button">गीत</string>
+    <string name="progress_downloading_title">गीत</string>
+    <string name="action_play">गीत</string>
+    <string name="action_pause">गीत</string>
+    <string name="info_pausing_song">गीत</string>
+    <string name="text_song_name">गीत</string>
+    <string name="text_song_artist">गीत</string>
+    <string name="text_song_id">गीत</string>
+    <string name="retrofit_example">गीत</string>
+</resources>

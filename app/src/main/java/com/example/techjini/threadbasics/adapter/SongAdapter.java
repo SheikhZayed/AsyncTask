@@ -2,22 +2,21 @@ package com.example.techjini.threadbasics.adapter;
 
 
 import android.content.Context;
-import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.techjini.threadbasics.MainActivity;
 import com.example.techjini.threadbasics.R;
-import com.example.techjini.threadbasics.helper.DownloadClickListener;
-import com.example.techjini.threadbasics.model.Songs;
+import com.example.techjini.threadbasics.interfaces.DownloadClickListener;
+import com.example.techjini.threadbasics.model.SongsModel;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -25,15 +24,14 @@ import java.util.ArrayList;
  */
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
-    private ArrayList<Songs> songsArrayList;
+    private ArrayList<SongsModel> mSongsArrayList;
     private Context mContext;
-    private DownloadClickListener downloadClickListener;
-    public static final String MESSAGE_PROGRESS = "message_progress";
+    private DownloadClickListener mDownloadClickListener;
 
-    public SongAdapter(ArrayList<Songs> songsArrayList, Context mContext, DownloadClickListener downloadClickListener) {
+    public SongAdapter(ArrayList<SongsModel> songsArrayList, Context mContext, DownloadClickListener downloadClickListener) {
         this.mContext = mContext;
-        this.songsArrayList = songsArrayList;
-        this.downloadClickListener = downloadClickListener;
+        this.mSongsArrayList = songsArrayList;
+        this.mDownloadClickListener = downloadClickListener;
     }
 
 
@@ -45,26 +43,27 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.textArtistName.setText(songsArrayList.get(position).getArtist());
-        holder.textSongName.setText(songsArrayList.get(position).getName());
-        if (songsArrayList.get(position).getState() == 1) {
-            holder.imgDownloadArrow.setImageResource(R.mipmap.ic_play);
-        }else if(songsArrayList.get(position).getState() == 2){
+
+        holder.textArtistName.setText(mSongsArrayList.get(position).getArtist());
+        holder.textSongName.setText(mSongsArrayList.get(position).getName());
+         if(checkFileExists(mSongsArrayList.get(position).getName())){
+            holder.imgDownloadArrow.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
+        }else if (mSongsArrayList.get(position).getState() == 0) {
             holder.imgDownloadArrow.setImageResource(R.drawable.ic_download);
         }
         else
             holder.imgDownloadArrow.setImageResource(R.drawable.ic_download);
-        Picasso.with(mContext).load(songsArrayList.get(position).getImage()).into(holder.imgThumbnail);
+        Picasso.with(mContext).load(mSongsArrayList.get(position).getImage()).into(holder.imgThumbnail);
         holder.imgDownloadArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                downloadClickListener.onDownloadClicked(songsArrayList.get(position).getId(), songsArrayList.get(position).getUrl(),songsArrayList.get(position).getName());
+                mDownloadClickListener.onDownloadClicked(mSongsArrayList.get(position).getId(), mSongsArrayList.get(position).getUrl(), mSongsArrayList.get(position).getName(),position);
             }
         });
     }
     @Override
     public int getItemCount() {
-        return songsArrayList.size();
+        return mSongsArrayList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -78,6 +77,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             imgDownloadArrow = (ImageView) itemView.findViewById(R.id.xIvDownload);
             textSongName = (TextView) itemView.findViewById(R.id.xTvSongName);
             textArtistName = (TextView) itemView.findViewById(R.id.xTvSongArtist);
+
         }
+    }
+    public boolean checkFileExists(String name){
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), name+".mp3");
+        if (file.exists()){
+            Log.d("info",name+ " exists");
+            return true;
+        }
+        else
+            return false;
     }
 }

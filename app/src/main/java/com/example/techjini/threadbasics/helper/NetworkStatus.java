@@ -7,11 +7,11 @@ import android.net.NetworkInfo;
 /**
  * Created by techjini on 19/9/16.
  */
-public class NetStatus {
+public class NetworkStatus {
 
     private Context mContext;
 
-    public NetStatus(Context mContext) {
+    public NetworkStatus(Context mContext) {
         this.mContext = mContext;
     }
 

@@ -1,5 +1,7 @@
 package com.example.techjini.threadbasics.helper;
 
+import com.example.techjini.threadbasics.constants.AppConstants;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -15,13 +17,11 @@ public class NetworkRequest {
     public static final String ERROR_IO_EXCEPTION = "http_io_exception_error";
     public static final String ERROR_UNKNOWN = "http_unknown_error";
 
-    //
     public String callServer() {
         String result = null;
         int resCode = -1;
         try {
-            //Declaring a URL Connection
-            URL url = new URL(StaticUtils.API_URL);
+            URL url = new URL(AppConstants.API_URL);
             URLConnection urlConn = url.openConnection();
             HttpURLConnection httpConn = (HttpURLConnection) urlConn;
             httpConn.setAllowUserInteraction(false);

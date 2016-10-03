@@ -1,4 +1,28 @@
 <resources>
     <string name="app_name">Thread Basics</string>
     <string name="btn_async">Async Activity</string>
+    <string name="header_detail">Song Details</string>
+    <string name="text_button_play">Play</string>
+    <string name="text_button_pause">pause</string>
+    <string name="progress_title">Please wait...</string>
+    <string name="progress_content">While fetching data from server</string>
+    <string name="error_timeout">time out occurred</string>
+    <string name="error_io">io exception occurred</string>
+    <string name="error_unknown">unknown error</string>
+    <string name="log_songID">"Song Id : "</string>
+    <string name="log_downloadurl">" : Download URL : "</string>
+    <string name="error_conn">error in establishing connection</string>
+    <string name="error_no_internet">No Internet Available</string>
+    <string name="info_playing_song">"Playing Song "</string>
+    <string name="notif_title">Downloading</string>
+    <string name="notif_content">"Downloading "</string>
+    <string name="notif_button">Play</string>
+    <string name="progress_downloading_title">"Downloading "</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="info_pausing_song">pausing song</string>
+    <string name="text_song_name">"Song Name : "</string>
+    <string name="text_song_artist">"Song Artist : "</string>
+    <string name="text_song_id">Song ID :</string>
+    <string name="retrofit_example">Retrofit Example</string>
 </resources>

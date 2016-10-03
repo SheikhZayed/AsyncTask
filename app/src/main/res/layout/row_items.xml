@@ -1,53 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="72dp"
-    >
-    <ImageView
-        android:id="@+id/xIvSongImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@mipmap/ic_launcher"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_margin="@dimen/activity_horizontal_margin"/>
-    <View
+<layout>
+    <data>
+        <variable
+            name="songs"
+            type="com.example.techjini.threadbasics.model.SongsModel">
+        </variable>
+    </data>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E0E0E0"
-        android:layout_alignParentBottom="true"></View>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/xIvDownload"
-        android:layout_marginLeft="72dp"
-        android:orientation="vertical"
-        android:layout_centerVertical="true">
-        <TextView
-            android:id="@+id/xTvSongName"
+        android:layout_height="72dp"
+        >
+        <ImageView
+            android:id="@+id/xIvSongImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@{songs.image}"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="@dimen/activity_horizontal_margin"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_alignParentBottom="true"></View>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Song Sojhjhhjgjhgjgjhgjhghjjhgjhghjgdjhgjhgjhgjhgjhg"
-            android:singleLine="true"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"/>
-        <TextView
-            android:id="@+id/xTvSongArtist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Song Sojhjhhjgjhgjgjhgjhghj"
-            android:singleLine="true"
-            android:textColor="#616161"
-            android:textSize="14sp"/>
-    </LinearLayout>
-    <ImageView
-        android:id="@+id/xIvDownload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:clickable="true"
-        android:layout_margin="@dimen/activity_horizontal_margin"/>
+            android:layout_toLeftOf="@+id/xIvDownload"
+            android:layout_marginLeft="72dp"
+            android:orientation="vertical"
+            android:layout_centerVertical="true">
+            <TextView
+                android:id="@+id/xTvSongName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{songs.name}"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/xTvSongArtist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{songs.artist}"
+                android:singleLine="true"
+                android:textColor="#616161"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/xIvDownload"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:src="@drawable/ic_download"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="64dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="64dp"
+            />
+    </RelativeLayout>
+</layout>
 
-
-</RelativeLayout>
